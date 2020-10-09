@@ -1,0 +1,13 @@
+
+
+Risk Analysis of GOOG
+
+Expected Return:  0.0744587445980615
+Total Return:  -1181.5759097765895
+Total Risk:  1.4068710504926714
+Sharpe Ratio (assuminng 0.01 risk-free return rate):  51.849070922378544
+Stock performance is excellent. Extremely low volatility is estimated.
+
+Downside risk:  0.9341198928165343
+Sortino ratio:  4025.3984543257316
+Stock performance is excellent. Extremely low downside risk is estimated.

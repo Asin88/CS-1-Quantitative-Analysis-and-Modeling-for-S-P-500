@@ -1,0 +1,11 @@
+Risk Analysis of ABT
+
+Expected Return:  0.05005460797792888
+Total Return:  -25.949711179068963
+Total Risk:  1.2322015333823875
+Sharpe Ratio (assuminng 0.01 risk-free return rate):  -9.903434386470927
+Stock performance is poor. High volatility is estimated.
+
+Downside risk:  0.9473608308029395
+Sortino ratio:  -705.5153417933075
+Stock performance is poor. High downside risk is estimated.

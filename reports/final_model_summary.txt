@@ -1,0 +1,55 @@
+Final Model:  KNN7 
+
+
+{'memory': None, 'steps': [('KNN7', KNeighborsClassifier(n_neighbors=7))], 'verbose': True, 'KNN7': KNeighborsClassifier(n_neighbors=7), 'KNN7__algorithm': 'auto', 'KNN7__leaf_size': 30, 'KNN7__metric': 'minkowski', 'KNN7__metric_params': None, 'KNN7__n_jobs': None, 'KNN7__n_neighbors': 7, 'KNN7__p': 2, 'KNN7__weights': 'uniform'}
+odes': None, 'RFC__max_samples': None, 'RFC__min_impurity_decrease': 0.0, 'RFC__min_impurity_split': None, 'RFC__min_samples_leaf': 1, 'RFC__min_samples_split': 2, 'RFC__min_weight_fraction_leaf': 0.0, 'RFC__n_estimators': 10, 'RFC__n_jobs': None, 'RFC__oob_score': False, 'RFC__random_state': None, 'RFC__verbose': 0, 'RFC__warm_start': False}
+Variable:                   15 Importance: 0.36
+Variable:                   14 Importance: 0.29
+Variable:                   16 Importance: 0.12
+Variable:                   13 Importance: 0.09
+Variable:                   17 Importance: 0.06
+Variable:                   11 Importance: 0.02
+Variable:                    3 Importance: 0.01
+Variable:                    4 Importance: 0.01
+Variable:                   18 Importance: 0.01
+Variable:                    0 Importance: 0.0
+Variable:                    1 Importance: 0.0
+Variable:                    2 Importance: 0.0
+Variable:                    5 Importance: 0.0
+Variable:                    6 Importance: 0.0
+Variable:                    7 Importance: 0.0
+Variable:                    8 Importance: 0.0
+Variable:                    9 Importance: 0.0
+Variable:                   10 Importance: 0.0
+Variable:                   12 Importance: 0.0
+Variable:                   19 Importance: 0.0
+Variable:                   20 Importance: 0.0
+Variable:                   21 Importance: 0.0
+Variable:                   22 Importance: 0.0
+
+
+Classification Report
+
+Confusion Matrices: 
+ [[[393   0]
+  [346   0]]
+
+ [[734   0]
+  [  5   0]]
+
+ [[351   0]
+  [388   0]]]
+              precision    recall  f1-score   support
+
+           0       0.00      0.00      0.00       346
+           1       0.00      0.00      0.00         5
+           2       0.00      0.00      0.00       388
+
+   micro avg       0.00      0.00      0.00       739
+   macro avg       0.00      0.00      0.00       739
+weighted avg       0.00      0.00      0.00       739
+ samples avg       0.00      0.00      0.00       739
+
+Accuracy:  0.0
+
+ROC AUC:  0.5

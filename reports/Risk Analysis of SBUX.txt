@@ -1,0 +1,11 @@
+Risk Analysis of SBUX
+
+Expected Return:  0.060023322058309146
+Total Return:  406.8333033627053
+Total Risk:  1.2360934026133883
+Sharpe Ratio (assuminng 0.01 risk-free return rate):  -5.549104089294536
+Stock performance is poor. High volatility is estimated.
+
+Downside risk:  0.8806918237626317
+Sortino ratio:  -459.0245336300502
+Stock performance is poor. High downside risk is estimated.
