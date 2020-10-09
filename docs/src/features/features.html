@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>features.py</title>
+  <link rel="stylesheet" href="..\..\pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>features.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>Created on Thu Oct  8 04:26:43 2020</p>
+<p>@author: AAKRITI</p>
+<p>CS - 1 : Quantitative Analysis and Modeling for S&amp;P 500</p>
+<p>Objective 3: Binary Classification - Given a stock and it’s data, you have to
+predict whether it will close lower than it opened (red) or higher than it
+opened (green).</p>
+<p>This script builds the target and feature matrix for binary classification. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Import modules</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">RepeatedKFold</span>
+<span class="kn">from</span> <span class="nn">sklearn.feature_selection</span> <span class="kn">import</span> <span class="n">RFE</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeRegressor</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>import graphlab as gl
+import talib as ta</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Define functions
+Function to get file path</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">f_getFilePath</span><span class="p">(</span><span class="n">rel_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <pre><code>This function gives the absolute file path from a given relative path
+
+Arguments:
+</code></pre>
+<p>rel_path: relative path of file to be accessed</p>
+<pre><code>Returns:
+</code></pre>
+<p>absolute path of file to be accessed</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">script_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>  <span class="c1"># i.e. /path/to/dir/foobar.py</span>
+    <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/dir/</span>
+    <span class="n">script_dir1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/</span>
+    <span class="n">cwd_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/</span>
+    <span class="n">abs_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd_dir</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">abs_file_path</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Objective 3: Binary Classification
+   Target : closing price higher or lower than opening price. Variable needs
+   to be created. 1 - higher, 0 - lower
+   Features: open, high, low, close, volume, price return, volatility, 
+   year, month, week, dayofweek, mon-fri, Stock High minus Low price (H-L), 
+   Stock Close minus Low price C-L), Stock High minus Close price (H-C),
+   MA for 10, 20, 50 days, std dev for 7 days, today&rsquo;s close compared with 1 
+   or 2 previous days&rsquo;, Moving Average Convergence Divergence (MACD), 
+   Relative Strength Index</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Import dataset from script</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">from</span> <span class="nn">visualization.calcVolatility</span> <span class="kn">import</span> <span class="n">df_cs1_new</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>from test import name_pred</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">name_pred</span> <span class="o">=</span> <span class="s2">&quot;AAL&quot;</span>
+<span class="n">date_pred</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Make dataframe</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_ticker_all</span> <span class="o">=</span> <span class="n">df_cs1_new</span><span class="p">[</span><span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">name_pred</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>df_ticker_all = df_ticker_all.set_index(&lsquo;date&rsquo;)</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_ticker_pred</span> <span class="o">=</span> <span class="n">df_ticker_all</span><span class="p">[</span><span class="n">df_ticker_all</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">date_pred</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Build features</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Stock High minus Low price (H-L)</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;H-L&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;high&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Stock Close minus Low price C-L)</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;C-L&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;low&quot;</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>Stock High minus Close price (H-C)</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;H-C&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;high&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span>
+<span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Indicator for closing high or low for past two days</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_cs1_lag1</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># by 1 days</span>
+<span class="n">df_cs1_lag2</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="o">.</span><span class="n">shift</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>  <span class="c1"># by 2 days</span>
+<span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close_lag1&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">df_cs1_lag1</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span>
+<span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close_lag2&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">df_cs1_lag2</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p>Moving Average for 10, 20, 50 days</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">ma_day</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">ma</span> <span class="ow">in</span> <span class="n">ma_day</span><span class="p">:</span>
+    <span class="n">column_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;MA for {ma} days&quot;</span>
+    <span class="n">df_ticker_pred</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">ma</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>std dev for 7 days</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;stdev for 7 days&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+
+<span class="n">df_ticker_pred</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="o">.</span><span class="n">replace</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+<span class="n">df_ticker_pred</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <p>Integer encoding for ticker name</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+<span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;Name_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <p>Features matrix</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">features</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;index&quot;</span><span class="p">,</span> <span class="s2">&quot;date&quot;</span><span class="p">,</span> <span class="s2">&quot;Name&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">f_getFilePath</span><span class="p">(</span><span class="s2">&quot;reports</span><span class="se">\\</span><span class="s2">Output_Report.xlsx&quot;</span><span class="p">),</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;openpyxl&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+    <span class="n">features</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Features Snapshot&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      <p>Build target variable</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">target</span> <span class="o">=</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_ticker_pred</span><span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">]</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">target</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">target</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">mask</span><span class="p">(</span><span class="n">target</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">target</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;category&quot;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">f_getFilePath</span><span class="p">(</span><span class="s2">&quot;reports</span><span class="se">\\</span><span class="s2">Output_Report.xlsx&quot;</span><span class="p">),</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;openpyxl&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+    <span class="n">target</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">30</span><span class="p">)</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Target Snapshot&quot;</span><span class="p">)</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>make_dataset.py</title>
+  <link rel="stylesheet" href="..\..\pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>make_dataset.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>Created on Tue Oct  6 02:24:42 2020</p>
+<p>@author: AAKRITI</p>
+<p>CS - 1 : Quantitative Analysis and Modeling for S&amp;P 500
+make_dataset.py
+Script to load data and make dataset</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Import modules</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="n">script_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>  <span class="c1"># i.e. /path/to/dir/foobar.py</span>
+<span class="n">script_dir1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/dir/</span>
+<span class="n">script_dir2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/dir/</span>
+<span class="n">cwd_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/</span>
+<span class="n">rel_path</span> <span class="o">=</span> <span class="s2">&quot;data</span><span class="se">\\</span><span class="s2">raw</span><span class="se">\\</span><span class="s2">cs-1.csv&quot;</span>
+<span class="n">abs_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd_dir</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">)</span>
+<span class="n">df_cs1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">abs_file_path</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="s2">&quot;infer&quot;</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Formatting date values</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_cs1</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">to_datetime</span><span class="p">(</span><span class="n">df_cs1</span><span class="o">.</span><span class="n">date</span><span class="p">)</span>  <span class="c1"># ,format=&#39;%Y-%m-%d&#39;)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Sorting by date</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_cs1_sorted</span> <span class="o">=</span> <span class="n">df_cs1</span><span class="o">.</span><span class="n">sort_values</span><span class="p">([</span><span class="s2">&quot;date&quot;</span><span class="p">],</span> <span class="n">ascending</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Creating new dataset to preserve raw dataset</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_cs1_new</span> <span class="o">=</span> <span class="n">df_cs1_sorted</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Check for missing values</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_missing</span> <span class="o">=</span> <span class="n">df_cs1_new</span><span class="p">[</span><span class="n">df_cs1_new</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>There are only 11 rows with missing values. 8 rows have all data missing for
+open, high and close. So they will be dropped. Out of remaining 3 rows, two
+are missing Name tag, so they will be dropped. The remaining 1 row is also 
+dropped as infering opening value from high, low, close is unreliable due to 
+volatile nature of stock market data. </p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_cs1_new</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">inplace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">df_cs1_new</span> <span class="o">=</span> <span class="n">df_cs1_new</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Separate date entities
+year = lambda x: datetime.strptime(str(x), &ldquo;%Y-%m-%d %H:%M:%S&rdquo; ).year</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;year&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">year</span>  <span class="c1"># map(lambda x: datetime.strptime(str(x), &quot;%Y-%m-%d %H:%M:%S&quot; ).year)</span>
+<span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;month&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_cs1_new</span><span class="p">[</span>
+    <span class="s2">&quot;date&quot;</span>
+<span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">month</span>  <span class="c1"># map(lambda x: datetime.strptime(str(x), &quot;%Y-%m-%d %H:%M:%S&quot; ).month)</span>
+<span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;week&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;date&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">isocalendar</span><span class="p">()</span><span class="o">.</span><span class="n">week</span>
+<span class="p">)</span>  <span class="c1"># map(lambda x: datetime.strptime(str(x), &quot;%Y-%m-%d %H:%M:%S&quot; ).strftime(&#39;%V&#39;))</span>
+<span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;dayOfWeek&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_cs1_new</span><span class="p">[</span>
+    <span class="s2">&quot;date&quot;</span>
+<span class="p">]</span><span class="o">.</span><span class="n">dt</span><span class="o">.</span><span class="n">dayofweek</span>  <span class="c1"># map(lambda x: datetime.strptime(str(x), &quot;%Y-%m-%d %H:%M:%S&quot; ).weekday())</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Identifier for whether a day is a Monday/Friday or Tuesday/Wednesday/Thursday</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">s_mon_fri</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">([</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">df_cs1_new</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_cs1_new</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;dayOfWeek&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;dayOfWeek&quot;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+        <span class="n">s_mon_fri</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">s_mon_fri</span><span class="o">.</span><span class="n">iat</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;mon_fri&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s_mon_fri</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

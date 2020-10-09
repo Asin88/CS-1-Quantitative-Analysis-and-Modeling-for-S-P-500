@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>starbucksStockExploration.py</title>
+  <link rel="stylesheet" href="..\..\pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>starbucksStockExploration.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>Created on Tue Oct  6 16:39:13 2020</p>
+<p>@author: AAKRITI</p>
+<p>CS - 1 : Quantitative Analysis and Modeling for S&amp;P 500</p>
+<p>This script analyses the stock performance of a given stock from the data. 
+The ticker nameo f the stock is given by user at runtime.</p>
+<p>Objective 1: Weekly Volatility Index</p>
+<p>Output: b) Give an exploratory analysis on any one stock describing it’s 
+   key statistical tendencies.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Import modules</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_pdf</span> <span class="kn">import</span> <span class="n">PdfPages</span>
+<span class="kn">from</span> <span class="nn">pandas.plotting</span> <span class="kn">import</span> <span class="n">lag_plot</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="kn">as</span> <span class="nn">sns</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s2">&quot;whitegrid&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;fivethirtyeight&quot;</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Define functions
+Function to get file path</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">f_getFilePath</span><span class="p">(</span><span class="n">rel_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <pre><code>This function gives the absolute file path from a given relative path
+
+Arguments:
+</code></pre>
+<p>rel_path: relative path of file to be accessed</p>
+<pre><code>Returns:
+</code></pre>
+<p>absolute path of file to be accessed</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">script_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>  <span class="c1"># i.e. /path/to/dir/foobar.py</span>
+    <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/dir/</span>
+    <span class="n">script_dir1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/</span>
+    <span class="n">cwd_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/</span>
+    <span class="n">abs_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd_dir</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">abs_file_path</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <pre><code>This function builds, displays and saves line plots using given parameters.
+
+Arguments:
+</code></pre>
+<p>df: dataframe to be plot
+   title: title of plot
+   xlabel: label of x-axis
+   ylabel: lable of y-axis
+   fig_name: name of figure to be saved</p>
+<pre><code>Returns: None
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">plotFigures</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">xlabel</span><span class="p">,</span> <span class="n">ylabel</span><span class="p">,</span> <span class="n">fig_name</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{title}&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{xlabel}&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{ylabel}&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>plt.savefig(f_getFilePath(f&rsquo;reports\figures\{fig_name}.png&rsquo;))</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <pre><code>This function builds, displays and saves histogram using given parameters.
+
+Arguments:
+</code></pre>
+<p>df: dataframe to be plot
+   title: title of plot
+   fig_name: name of figure to be saved</p>
+<pre><code>Returns: None
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">plotHistograms</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">fig_name</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">hist</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{title}&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>plt.savefig(f_getFilePath(f&rsquo;reports\figures\{fig_name}.png&rsquo;))</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Objective 1 - Output b) Key Statistical Tendencies of given stock:
+   Daily closing price and volume trend
+   Distribution trend of opening, high, low, close and volume
+   Daily returns
+   Cumulative Returns
+   Moving Average for 10,20,50 days
+   Auto-correlation with 5 day lag
+   Volatility
+   Risk-Adjusted Returns
+   Sharpe Ratio (or Risk-Adjusted Return Ratio)
+   Sortino Ratio (or Downside Risk Adjusted Return Ratio)</p>
+<p>Import data from script</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">from</span> <span class="nn">visualization.calcVolatility</span> <span class="kn">import</span> <span class="n">df_cs1_new</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Select stock data
+Get ticker name from user
+print(&lsquo;Enter ticket name to be analysed: &lsquo;)
+loopagain = 1
+while loopagain == 1:
+   ticker_name = input()
+   if ticker_name not in df_cs1_new[&lsquo;Name&rsquo;].unique():
+       print(&lsquo;Stock not listed in dataset. Please try another stock.&rsquo;)
+   else:
+       loopagain = 0</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">ticker_name</span> <span class="o">=</span> <span class="s2">&quot;SBUX&quot;</span>
+
+<span class="n">df_tickername</span> <span class="o">=</span> <span class="n">df_cs1_new</span><span class="p">[</span><span class="n">df_cs1_new</span><span class="p">[</span><span class="s2">&quot;Name&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">ticker_name</span><span class="p">]</span>
+<span class="n">df_tickername</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s2">&quot;date&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>Create PDF file for figures</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">with</span> <span class="n">PdfPages</span><span class="p">(</span><span class="s2">&quot;Starbuck_Stock_Trend_Figures.pdf&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pdf</span><span class="p">:</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>Daily closing price</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">plotFigures</span><span class="p">(</span>
+        <span class="n">df_tickername</span><span class="p">[[</span><span class="s2">&quot;close&quot;</span><span class="p">]],</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Closing Price Trend&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Time (in days)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Closing Price&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name}_Daily_Closing_Price&quot;</span><span class="p">,</span>
+    <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Daily volume</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">plotFigures</span><span class="p">(</span>
+        <span class="n">df_tickername</span><span class="p">[[</span><span class="s2">&quot;volume&quot;</span><span class="p">]],</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Volume Trend&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Time (in days)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Volume&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name}_Daily_Volume&quot;</span><span class="p">,</span>
+    <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p>Histograms</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">titles</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Opening Prices&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} High Prices&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Low Prices&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Closing Prices&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Volume&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">fig_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Open&quot;</span><span class="p">,</span> <span class="s2">&quot;High&quot;</span><span class="p">,</span> <span class="s2">&quot;Low&quot;</span><span class="p">,</span> <span class="s2">&quot;Close&quot;</span><span class="p">,</span> <span class="s2">&quot;Volume&quot;</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">df_tickername</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">column</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">,</span> <span class="s2">&quot;high&quot;</span><span class="p">,</span> <span class="s2">&quot;low&quot;</span><span class="p">,</span> <span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="s2">&quot;volume&quot;</span><span class="p">]:</span>
+            <span class="n">plotHistograms</span><span class="p">(</span><span class="n">df_tickername</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> <span class="n">f</span><span class="s2">&quot;{titles[i]}&quot;</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;{ticker_name}_{fig_names[i]}_Histogram&quot;</span><span class="p">)</span>
+            <span class="n">i</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Daily Returns</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">pct_change</span><span class="p">()</span>
+    <span class="n">plotFigures</span><span class="p">(</span>
+        <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">],</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Daily Return&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Time (in days)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Daily Return&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name}_Daily_Return&quot;</span><span class="p">,</span>
+    <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <p>Daily Returns - Histogram + KDE Plot</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">(),</span> <span class="n">bins</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;purple&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Daily Return&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{ticker_name} Daily Return Histogram&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <p>plt.savefig(f_getFilePath(f&rsquo;reports\figures\{ticker_name}_Daily_Return_HistKDE.png&rsquo;))</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      <p>Cumulative Return</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">df_cr</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Price_Returns&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">cumsum</span><span class="p">()</span>
+    <span class="n">plotFigures</span><span class="p">(</span>
+        <span class="n">df_cr</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Cumulative Returns&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Time (in days)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Cumulative Return&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name}_Cumulative_Return&quot;</span><span class="p">,</span>
+    <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
+      </div>
+      <p>Moving Average for 10, 20, 50 days</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">ma_day</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">50</span><span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">ma</span> <span class="ow">in</span> <span class="n">ma_day</span><span class="p">:</span>
+        <span class="n">column_name</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;MA for {ma} days&quot;</span>
+        <span class="n">df_tickername</span><span class="p">[</span><span class="n">column_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;close&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">rolling</span><span class="p">(</span><span class="n">ma</span><span class="p">)</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+
+    <span class="n">plotFigures</span><span class="p">(</span>
+        <span class="n">df_tickername</span><span class="p">[[</span><span class="s2">&quot;close&quot;</span><span class="p">,</span> <span class="s2">&quot;MA for 10 days&quot;</span><span class="p">,</span> <span class="s2">&quot;MA for 20 days&quot;</span><span class="p">,</span> <span class="s2">&quot;MA for 50 days&quot;</span><span class="p">]],</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Moving Average&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Time (in days)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Closing Price&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name}_Moving_Average&quot;</span><span class="p">,</span>
+    <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-21'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-21'>#</a>
+      </div>
+      <p>Auto-Correlation</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+    <span class="n">lag_plot</span><span class="p">(</span><span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;open&quot;</span><span class="p">],</span> <span class="n">lag</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;{ticker_name} Autocorrelation Plot&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-22'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      <p>plt.savefig(f_getFilePath(f&rsquo;reports\figures\{ticker_name}_Autocorrelation_Plot.png&rsquo;))</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      <p>Volatility</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">plotFigures</span><span class="p">(</span>
+        <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Volatility&quot;</span><span class="p">],</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name} Volatility&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Time (in days)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Historical Volatility&quot;</span><span class="p">,</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name}_Volatility&quot;</span><span class="p">,</span>
+    <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-24'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-24'>#</a>
+      </div>
+      <p>Risk Analysis</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">expected_return</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">total_return</span> <span class="o">=</span> <span class="p">(</span><span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">/</span> <span class="n">df_tickername</span><span class="p">[</span>
+        <span class="s2">&quot;Daily_Return&quot;</span>
+    <span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-25'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-25'>#</a>
+      </div>
+      <p>annualized_return = (logsumexp((total_return + 1)**(1/6)))-1 #Using special scipy function because exponentail of very large negative number is rounded to zero.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">rf</span> <span class="o">=</span> <span class="mf">0.01</span>  <span class="c1"># risk-free return rate (assumed value)</span>
+    <span class="n">total_risk</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-26'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-26'>#</a>
+      </div>
+      <p>COnvert cumulative reurn to arithmetic returns</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">a_return</span> <span class="o">=</span> <span class="n">df_cr</span><span class="o">.</span><span class="n">diff</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-27'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-27'>#</a>
+      </div>
+      <p>Plot returns vs risk</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">x</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">*</span> <span class="mi">20</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Expected return&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Risk&quot;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span>
+        <span class="n">f</span><span class="s2">&quot;{ticker_name}&quot;</span><span class="p">,</span>
+        <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+        <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span>
+        <span class="n">textcoords</span><span class="o">=</span><span class="s2">&quot;offset points&quot;</span><span class="p">,</span>
+        <span class="n">ha</span><span class="o">=</span><span class="s2">&quot;right&quot;</span><span class="p">,</span>
+        <span class="n">va</span><span class="o">=</span><span class="s2">&quot;bottom&quot;</span><span class="p">,</span>
+        <span class="n">arrowprops</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">arrowstyle</span><span class="o">=</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">connectionstyle</span><span class="o">=</span><span class="s2">&quot;arc3,rad=-0.3&quot;</span><span class="p">),</span>
+    <span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-28'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-28'>#</a>
+      </div>
+      <p>plt.savefig(f_getFilePath(f&rsquo;reports\figures\{ticker_name}_Risk.png&rsquo;))</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">pdf</span><span class="o">.</span><span class="n">savefig</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-29'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-29'>#</a>
+      </div>
+      <p>Sharpe Ratio</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">sharpe_ratio</span> <span class="o">=</span> <span class="p">((</span><span class="n">a_return</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">rf</span><span class="p">)</span> <span class="o">/</span> <span class="n">a_return</span><span class="o">.</span><span class="n">std</span><span class="p">())</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">252</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-30'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-30'>#</a>
+      </div>
+      <p>Print report</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">riskfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">f_getFilePath</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;reports</span><span class="se">\\</span><span class="s2">Risk Analysis of {ticker_name}.txt&quot;</span><span class="p">),</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Risk Analysis of {ticker_name}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Expected Return: &quot;</span><span class="p">,</span> <span class="n">expected_return</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Total Return: &quot;</span><span class="p">,</span> <span class="n">total_return</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Total Risk: &quot;</span><span class="p">,</span> <span class="n">total_risk</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Sharpe Ratio (assuminng {rf} risk-free return rate): &quot;</span><span class="p">,</span> <span class="n">sharpe_ratio</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">sharpe_ratio</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is excellent. Extremely low volatility is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sharpe_ratio</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is very good. Very low volatility is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sharpe_ratio</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is good. Low volatility is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sharpe_ratio</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is fair. Moderate volatility is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is poor. High volatility is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-31'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-31'>#</a>
+      </div>
+      <p>Sortino Ratio
+Create a downside return column with the negative returns only</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">target</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">downside_returns</span> <span class="o">=</span> <span class="n">df_tickername</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">df_tickername</span><span class="p">[</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">target</span><span class="p">][</span><span class="s2">&quot;Daily_Return&quot;</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-32'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-32'>#</a>
+      </div>
+      <p>Calculate and std dev of downside</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">down_risk</span> <span class="o">=</span> <span class="n">downside_returns</span><span class="o">.</span><span class="n">std</span><span class="p">()</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-33'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-33'>#</a>
+      </div>
+      <p>Calculate the sortino ratio</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">sortino_ratio</span> <span class="o">=</span> <span class="p">((</span><span class="n">a_return</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span> <span class="o">-</span> <span class="n">rf</span><span class="p">)</span> <span class="o">/</span> <span class="n">down_risk</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">252</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-34'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-34'>#</a>
+      </div>
+      <p>Print report</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Downside risk: &quot;</span><span class="p">,</span> <span class="n">down_risk</span> <span class="o">*</span> <span class="mi">100</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Sortino ratio: &quot;</span><span class="p">,</span> <span class="n">sortino_ratio</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">sortino_ratio</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is excellent. Extremely low downside risk is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sortino_ratio</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is very good. Very low downside risk is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sortino_ratio</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is good. Low downside risk is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">sortino_ratio</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is fair. Moderate downside risk is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Stock performance is poor. High downside risk is estimated.&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">riskfile</span><span class="p">)</span>
+
+<span class="n">riskfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

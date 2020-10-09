@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>train_model.py</title>
+  <link rel="stylesheet" href="..\..\pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>train_model.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>Created on Thu Oct  8 09:11:32 2020</p>
+<p>@author: AAKRITI</p>
+<p>CS - 1 : Quantitative Analysis and Modeling for S&amp;P 500</p>
+<p>Objective 3: Binary Classification - Given a stock and it’s data, you have to
+predict whether it will close lower than it opened (red) or higher than it
+opened (green).</p>
+<p>This script trains and selects the best classification model.
+Models compared:
+   Baseline
+   Multinomial Logistic Regression
+   K Nearest Neighbours
+   Gaussian Naive Bayes
+   Decision Tree Classifier (CART)
+   Random Forest Classifier
+   Gradient Boosting Classifier</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>Import modules</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn.dummy</span> <span class="kn">import</span> <span class="n">DummyClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KNeighborsClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.naive_bayes</span> <span class="kn">import</span> <span class="n">GaussianNB</span>
+<span class="kn">from</span> <span class="nn">sklearn.tree</span> <span class="kn">import</span> <span class="n">DecisionTreeClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">GradientBoostingClassifier</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span><span class="p">,</span> <span class="n">TimeSeriesSplit</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Define functions
+Function to get file path</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">f_getFilePath</span><span class="p">(</span><span class="n">rel_path</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <pre><code>This function gives the absolute file path from a given relative path
+
+Arguments:
+</code></pre>
+<p>rel_path: relative path of file to be accessed</p>
+<pre><code>Returns:
+</code></pre>
+<p>absolute path of file to be accessed</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">script_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>  <span class="c1"># i.e. /path/to/dir/foobar.py</span>
+    <span class="n">script_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/dir/</span>
+    <span class="n">script_dir1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/</span>
+    <span class="n">cwd_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/</span>
+    <span class="n">abs_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd_dir</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">abs_file_path</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <pre><code>This function builds several classifer models and fits training data.
+
+Arguments:
+</code></pre>
+<p>m_name: model name
+   clf_estimator: classification estimator
+   train_x: training features
+   train_y: training target</p>
+<pre><code>Returns: None
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">f_buildModels</span><span class="p">(</span><span class="n">m_name</span><span class="p">,</span> <span class="n">clf_estimator</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Building {m_name} model...&quot;</span><span class="p">)</span>
+    <span class="n">model_pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="n">m_name</span><span class="p">,</span> <span class="n">clf_estimator</span><span class="p">)],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>fitting the data in the pipe</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">clf_model</span> <span class="o">=</span> <span class="n">model_pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">m_name</span><span class="p">,</span> <span class="n">clf_model</span><span class="p">]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Function to evaluate all training models</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">f_modelEvaluation</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">clf_model</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">):</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <pre><code>This function cross-validates the model passed as argument with 5-fold Time Series Split and measures average accuracy of predictions in each fold.
+
+Arguments:
+model_name: model name
+clf_model: classificaion model fitted on training data
+train_x: triaing features
+train_y: training target
+
+Returns: two lists
+</code></pre>
+<p>list holding model name and mean accuracy
+   list holding model name and mean macro f1 score</p>
+<p>Define the evaluation method</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">cv</span> <span class="o">=</span> <span class="n">TimeSeriesSplit</span><span class="p">(</span><span class="n">n_splits</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>evaluate the model on the dataset</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="n">n_scores_acc</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf_model</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;accuracy&quot;</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">n_scores_f1</span> <span class="o">=</span> <span class="n">cross_val_score</span><span class="p">(</span><span class="n">clf_model</span><span class="p">,</span> <span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">,</span> <span class="n">scoring</span><span class="o">=</span><span class="s2">&quot;f1_macro&quot;</span><span class="p">,</span> <span class="n">cv</span><span class="o">=</span><span class="n">cv</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">model_name</span><span class="p">,</span> <span class="n">clf_model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">n_scores_acc</span><span class="p">)],</span> <span class="p">[</span><span class="n">model_name</span><span class="p">,</span> <span class="n">clf_model</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">n_scores_f1</span><span class="p">)]</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Main function</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Training binary classifier models...&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">features.feature_selection</span> <span class="kn">import</span> <span class="n">train_x_transformed</span><span class="p">,</span> <span class="n">train_y</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>Build training models</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Building training models...&quot;</span><span class="p">)</span>
+<span class="n">modelevalfile</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">f_getFilePath</span><span class="p">(</span><span class="s2">&quot;reports</span><span class="se">\\</span><span class="s2">model_comparison.txt&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model Comparison</span><span class="se">\n\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">modelevalfile</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Model Name</span><span class="se">\t</span><span class="s2">Accuracy</span><span class="se">\t</span><span class="s2">ROC AUC&quot;</span><span class="p">,</span> <span class="nb">file</span><span class="o">=</span><span class="n">modelevalfile</span><span class="p">)</span>
+
+<span class="n">estimator_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;Baseline&quot;</span><span class="p">:</span> <span class="n">DummyClassifier</span><span class="p">(</span><span class="n">strategy</span><span class="o">=</span><span class="s2">&quot;stratified&quot;</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">),</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <pre><code>          'Logistic': LogisticRegression(multi_class = 'multinomial'),
+</code></pre>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>    <span class="s2">&quot;KNN3&quot;</span><span class="p">:</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;KNN5&quot;</span><span class="p">:</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">5</span><span class="p">),</span>
+    <span class="s2">&quot;KNN7&quot;</span><span class="p">:</span> <span class="n">KNeighborsClassifier</span><span class="p">(</span><span class="n">n_neighbors</span><span class="o">=</span><span class="mi">7</span><span class="p">),</span>
+    <span class="s2">&quot;GNB&quot;</span><span class="p">:</span> <span class="n">GaussianNB</span><span class="p">(),</span>
+    <span class="s2">&quot;CART&quot;</span><span class="p">:</span> <span class="n">DecisionTreeClassifier</span><span class="p">(</span><span class="n">criterion</span><span class="o">=</span><span class="s2">&quot;entropy&quot;</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;RFC&quot;</span><span class="p">:</span> <span class="n">RandomForestClassifier</span><span class="p">(</span><span class="n">n_estimators</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">max_depth</span><span class="o">=</span><span class="mi">3</span><span class="p">),</span>
+    <span class="s2">&quot;GBC&quot;</span><span class="p">:</span> <span class="n">GradientBoostingClassifier</span><span class="p">(),</span>
+<span class="p">}</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_y</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span>
+<span class="n">model_dict</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">for</span> <span class="n">m_name</span><span class="p">,</span> <span class="n">clf_estimator</span> <span class="ow">in</span> <span class="n">estimator_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">m_name</span><span class="p">,</span> <span class="n">clf_model</span> <span class="o">=</span> <span class="n">f_buildModels</span><span class="p">(</span><span class="n">m_name</span><span class="p">,</span> <span class="n">clf_estimator</span><span class="p">,</span> <span class="n">train_x_transformed</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+    <span class="n">model_dict</span><span class="p">[</span><span class="n">m_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">clf_model</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p>Evaluate and Compare All Models</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Comparing all models...&quot;</span><span class="p">)</span>
+<span class="n">model_accs</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">model_f1s</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">m_name</span><span class="p">,</span> <span class="n">clf_model</span> <span class="ow">in</span> <span class="n">model_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="n">list_acc</span><span class="p">,</span> <span class="n">list_f1</span> <span class="o">=</span> <span class="n">f_modelEvaluation</span><span class="p">(</span><span class="n">m_name</span><span class="p">,</span> <span class="n">clf_model</span><span class="p">,</span> <span class="n">train_x_transformed</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+    <span class="n">model_accs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_acc</span><span class="p">)</span>
+    <span class="n">model_f1s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">list_f1</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p>Report performance</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="n">model_accs</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">model_f1s</span><span class="p">)</span>
+<span class="n">df_temp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model_accs</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Model Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Model Params&quot;</span><span class="p">,</span> <span class="s2">&quot;Accuracy&quot;</span><span class="p">])</span>
+<span class="n">df_temp</span> <span class="o">=</span> <span class="n">df_temp</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;Model Params&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df_temp2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">model_f1s</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Model Name&quot;</span><span class="p">,</span> <span class="s2">&quot;Model Params&quot;</span><span class="p">,</span> <span class="s2">&quot;F1-Score&quot;</span><span class="p">])</span>
+<span class="n">df_temp2</span> <span class="o">=</span> <span class="n">df_temp2</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;Model Params&quot;</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">df_temp</span><span class="p">[</span><span class="s2">&quot;F1-Score&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_temp2</span><span class="p">[</span><span class="s2">&quot;F1-Score&quot;</span><span class="p">]</span>
+<span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">f_getFilePath</span><span class="p">(</span><span class="s2">&quot;reports</span><span class="se">\\</span><span class="s2">Output_Report.xlsx&quot;</span><span class="p">),</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;openpyxl&quot;</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+    <span class="n">df_temp</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="s2">&quot;Model Comparison&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p>Select model with highest macro f1 scores
+Investigation of model performance metrics (precision and recall) showed that predictions are heavily biased towards 0.
+    This indicates class imbalance in training data. Accuracy, precision and recall are sensitive to class imbalance. 
+    However, f1 score is insenstive. Hence, the evaluation score is selected as f1 score.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">model_f1s</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="n">final_model_name</span> <span class="o">=</span> <span class="n">model_f1s</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">final_model</span> <span class="o">=</span> <span class="n">model_f1s</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Selected model is {final_model_name}.</span><span class="se">\n</span><span class="s2">F1 score is {model_f1s[0][2]}&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Predict from train_x_transformed</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">train_pred</span> <span class="o">=</span> <span class="n">final_model</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">train_x_transformed</span><span class="p">)</span>  <span class="c1"># Predicted probabilities of y</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <p>if final_model_name == &lsquo;Logistic&rsquo;:</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">classes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="n">train_pred_1</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">train_pred</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">classes</span><span class="p">))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <p>else:
+   train_pred = pd.Series(train_pred)
+   train_pred = pd.cut(train_pred, 3, labels=[0,1,2], include_lowest=True)</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      <p>Model Summary and Metrics</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">models.model_summary</span>  <span class="c1"># import f_modelSummary(final_model_name, final_model)</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>

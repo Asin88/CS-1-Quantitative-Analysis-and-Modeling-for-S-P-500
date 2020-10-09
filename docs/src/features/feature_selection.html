@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>feature_selection.py</title>
+  <link rel="stylesheet" href="..\..\pycco.css">
+</head>
+<body>
+<div id='container'>
+  <div id="background"></div>
+  <div class='section'>
+    <div class='docs'><h1>feature_selection.py</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>Created on Fri Oct  9 03:05:45 2020</p>
+<p>@author: AAKRITI</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span></span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>-<em>- coding: utf-8 -</em>-</p>
+<p>Created on Fri Aug 14 04:11:24 2020</p>
+<p>@author: AAKRITI</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Script to perform factor analysis</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>Import modules</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">sklearn.pipeline</span> <span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">preprocessing</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>from sklearn.decomposition import PCA</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="kn">from</span> <span class="nn">factor_analyzer</span> <span class="kn">import</span> <span class="n">FactorAnalyzer</span><span class="p">,</span> <span class="n">calculate_bartlett_sphericity</span><span class="p">,</span> <span class="n">calculate_kmo</span>
+<span class="kn">from</span> <span class="nn">sklearn.dummy</span> <span class="kn">import</span> <span class="n">DummyClassifier</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Define functions</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Function to get absolute file path</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">def</span> <span class="nf">f_getFilePath</span><span class="p">(</span><span class="n">rel_path</span><span class="p">):</span>
+    <span class="n">script_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>  <span class="c1"># i.e. /path/to/dir/foobar.py</span>
+    <span class="n">script_dir1</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_path</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/dir/</span>
+    <span class="n">script_dir2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/dir/</span>
+    <span class="n">cwd_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">script_dir2</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># i.e. /path/to/</span>
+    <span class="n">abs_file_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cwd_dir</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">abs_file_path</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Main funtion</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Performing feature selection...&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">features.features</span> <span class="kn">import</span> <span class="n">features</span><span class="p">,</span> <span class="n">target</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p>Split data into train and test. Leave last 20% rows for test.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Splitting data into training and test datasets...&quot;</span><span class="p">)</span>
+<span class="n">split_ratio</span> <span class="o">=</span> <span class="mf">0.80</span>
+<span class="n">train_len</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">features</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">split_ratio</span><span class="p">)</span>
+<span class="n">train_x</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">train_len</span><span class="p">,</span> <span class="p">:]</span>
+<span class="n">test_x</span> <span class="o">=</span> <span class="n">features</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_len</span><span class="p">:,</span> <span class="p">:]</span>
+<span class="n">train_y</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:</span><span class="n">train_len</span><span class="p">]</span>
+<span class="n">test_y</span> <span class="o">=</span> <span class="n">target</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="n">train_len</span><span class="p">:]</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_x</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">train_y</span><span class="o">.</span><span class="n">head</span><span class="p">())</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p>Feature Selection</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="k">print</span><span class="p">(</span><span class="s2">&quot;Performing Scaling and PCA...&quot;</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p>Pipe flow is :
+Scaling the data -&gt; PCA(Dimension reduction to two) &ndash;&gt; Dummy Classifier</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">feature_pipe</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">([(</span><span class="s2">&quot;minmax&quot;</span><span class="p">,</span> <span class="n">preprocessing</span><span class="o">.</span><span class="n">MinMaxScaler</span><span class="p">())],</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p>fitting the data in the pipe</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="n">feature_pipe</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_x</span><span class="p">,</span> <span class="n">train_y</span><span class="p">)</span>
+<span class="n">minmax</span> <span class="o">=</span> <span class="n">feature_pipe</span><span class="o">.</span><span class="n">named_steps</span><span class="p">[</span><span class="s2">&quot;minmax&quot;</span><span class="p">]</span>
+<span class="n">train_x_transformed</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">minmax</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">train_x</span><span class="p">))</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p>=============================================================================</p>
+<h1>PCA and Factor Analysis is encountering a bug related to incorrect calculation of variance.</h1>
+<h1>Refer https://github.com/scikit-learn/scikit-learn/pull/9105</h1>
+<p>num_factors = 10</p>
+<h1>Pipe flow is :</h1>
+<h1>Scaling the data -&gt; PCA(Dimension reduction to two) &ndash;&gt; Dummy Classifier</h1>
+<p>feature_pipe = Pipeline([(&lsquo;std&rsquo;, preprocessing.MinMaxScaler()), (&lsquo;fa&rsquo;, FactorAnalyzer(n_factors = num_factors,rotation=&rsquo;varimax&rsquo;)), (&lsquo;dummy_model&rsquo;, DummyClassifier(&ldquo;stratified&rdquo;,random_state = 42))], verbose = True)</p>
+<h1>fitting the data in the pipe</h1>
+<p>feature_pipe.fit(train_x, train_y)</p>
+<h1>Transform training data</h1>
+<p>fa = feature_pipe.named_steps[&lsquo;fa&rsquo;]
+eigen_values = pd.DataFrame(fa.get_eigenvalues()).round(decimals = 2)
+loadings = pd.DataFrame(fa.loadings_,).round(decimals = 2)
+communalities = pd.DataFrame(np.round(fa.get_communalities(), 2), columns = [&lsquo;Communalities&rsquo;]).round(decimals = 2)
+covariances = pd.DataFrame(fa.get_factor_variance()).round(decimals = 2)
+train_x_transformed = pd.DataFrame(fa.transform(train_x))</p>
+<h1>Save factor analysis report</h1>
+<p>fafile = open(f_getFilePath(&lsquo;reports\factor_analysis.txt&rsquo;), &lsquo;w+&rsquo;)
+print(&lsquo;Factor Analysis Report\n\n&rsquo;, file = fafile)
+print(&lsquo;Eigen Values&rsquo;, file = fafile)
+print(eigen_values, &lsquo;\n&rsquo;, file = fafile)
+print(&lsquo;Factor Loadings&rsquo;, file = fafile)
+print(loadings, &lsquo;\n&rsquo;, file = fafile)
+print(communalities, &lsquo;\n&rsquo;, file = fafile)
+print(&ldquo;Variances \n1. Sum of squared loadings (variance) \n2. Proportional variance \n3. Cumulative variance)&rdquo;, file = fafile)
+print(covariances, file = fafile)
+fafile.close()
+=============================================================================</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>
