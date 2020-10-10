@@ -85,4 +85,5 @@ output_1a["Volatility Top Ten"] = most_vol_10["Volatility"]
 output_1a["Least Volatile Stocks"] = least_vol_10["Name"]
 output_1a["Volatility Bottom Ten"] = least_vol_10["Volatility"]
 # Print report
-output_1a.to_csv(f_getFilePath("reports\\Top_Ten_Most_and_Least_Volatile_Stocks.csv"), index=False, encoding="utf-8")
+with pd.ExcelWriter(f_getFilePath("reports\\Output_Report.xlsx"), engine="openpyxl", mode="a") as writer:
+        output_1a.to_excel(writer, sheet_name="Top_10_Volatile_Stocks")

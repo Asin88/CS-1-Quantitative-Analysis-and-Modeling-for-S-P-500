@@ -1,20 +1,15 @@
-Final Model:  RFC 
+Final Model:  CART 
 
 
-{'memory': None, 'steps': [('RFC', RandomForestClassifier(max_depth=3, n_estimators=10))], 'verbose': True, 'RFC': RandomForestClassifier(max_depth=3, n_estimators=10), 'RFC__bootstrap': True, 'RFC__ccp_alpha': 0.0, 'RFC__class_weight': None, 'RFC__criterion': 'gini', 'RFC__max_depth': 3, 'RFC__max_features': 'auto', 'RFC__max_leaf_nodes': None, 'RFC__max_samples': None, 'RFC__min_impurity_decrease': 0.0, 'RFC__min_impurity_split': None, 'RFC__min_samples_leaf': 1, 'RFC__min_samples_split': 2, 'RFC__min_weight_fraction_leaf': 0.0, 'RFC__n_estimators': 10, 'RFC__n_jobs': None, 'RFC__oob_score': False, 'RFC__random_state': None, 'RFC__verbose': 0, 'RFC__warm_start': False}
-Variable:                   15 Importance: 0.32
-Variable:                   16 Importance: 0.27
-Variable:                   13 Importance: 0.17
-Variable:                   14 Importance: 0.11
-Variable:                   17 Importance: 0.07
-Variable:                    2 Importance: 0.01
-Variable:                    4 Importance: 0.01
-Variable:                   19 Importance: 0.01
-Variable:                   20 Importance: 0.01
-Variable:                   21 Importance: 0.01
+{'memory': None, 'steps': [('CART', DecisionTreeClassifier(criterion='entropy', max_depth=3))], 'verbose': True, 'CART': DecisionTreeClassifier(criterion='entropy', max_depth=3), 'CART__ccp_alpha': 0.0, 'CART__class_weight': None, 'CART__criterion': 'entropy', 'CART__max_depth': 3, 'CART__max_features': None, 'CART__max_leaf_nodes': None, 'CART__min_impurity_decrease': 0.0, 'CART__min_impurity_split': None, 'CART__min_samples_leaf': 1, 'CART__min_samples_split': 2, 'CART__min_weight_fraction_leaf': 0.0, 'CART__presort': 'deprecated', 'CART__random_state': None, 'CART__splitter': 'best'}
+Variable:                   15 Importance: 0.68
+Variable:                   13 Importance: 0.18
+Variable:                   14 Importance: 0.14
 Variable:                    0 Importance: 0.0
 Variable:                    1 Importance: 0.0
+Variable:                    2 Importance: 0.0
 Variable:                    3 Importance: 0.0
+Variable:                    4 Importance: 0.0
 Variable:                    5 Importance: 0.0
 Variable:                    6 Importance: 0.0
 Variable:                    7 Importance: 0.0
@@ -23,32 +18,37 @@ Variable:                    9 Importance: 0.0
 Variable:                   10 Importance: 0.0
 Variable:                   11 Importance: 0.0
 Variable:                   12 Importance: 0.0
+Variable:                   16 Importance: 0.0
+Variable:                   17 Importance: 0.0
 Variable:                   18 Importance: 0.0
+Variable:                   19 Importance: 0.0
+Variable:                   20 Importance: 0.0
+Variable:                   21 Importance: 0.0
 Variable:                   22 Importance: 0.0
 
 
 Classification Report
 
 Confusion Matrices: 
- [[[357  74]
-  [ 33 341]]
+ [[[316 115]
+  [ 12 362]]
 
  [[793   0]
   [ 12   0]]
 
- [[314  72]
-  [ 37 382]]]
+ [[279 107]
+  [ 17 402]]]
               precision    recall  f1-score   support
 
-           0       0.82      0.91      0.86       374
+           0       0.76      0.97      0.85       374
            1       0.00      0.00      0.00        12
-           2       0.84      0.91      0.88       419
+           2       0.79      0.96      0.87       419
 
-   micro avg       0.83      0.90      0.86       805
-   macro avg       0.55      0.61      0.58       805
-weighted avg       0.82      0.90      0.86       805
- samples avg       0.86      0.90      0.87       805
+   micro avg       0.77      0.95      0.85       805
+   macro avg       0.52      0.64      0.57       805
+weighted avg       0.76      0.95      0.85       805
+ samples avg       0.84      0.95      0.88       805
 
 Accuracy:  0.0
 
-ROC AUC:  0.7442061639523406
+ROC AUC:  0.7305530379822315

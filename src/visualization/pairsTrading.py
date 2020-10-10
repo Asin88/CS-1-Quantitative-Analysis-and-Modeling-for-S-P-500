@@ -84,4 +84,6 @@ for year in df_cs1_new["year"].unique():
 
 # Print report
 # print(corr.head())
-output_2.to_csv(f_getFilePath("reports\\Pair_Trading_Strongest_Pairs.csv"), index=False, encoding="utf-8")
+# Print report
+with pd.ExcelWriter(f_getFilePath("reports\\Output_Report.xlsx"), engine="openpyxl", mode="a") as writer:
+        output_2.to_excel(writer, sheet_name="Pairs_Trading_Strongest_Pairs")

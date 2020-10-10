@@ -121,7 +121,7 @@ df_tickername = df_cs1_new[df_cs1_new["Name"] == ticker_name]
 df_tickername = df_tickername.set_index("date")
 
 # Create PDF file for figures
-with PdfPages(f_getFilePath("reports\\Starbuck_Stock_Trend_Figures.pdf")) as pdf:
+with PdfPages(f_getFilePath("reports\\figures\\Starbuck_Stock_Trend_Figures.pdf")) as pdf:
 
     # Daily closing price
     plotFigures(
@@ -251,6 +251,7 @@ with PdfPages(f_getFilePath("reports\\Starbuck_Stock_Trend_Figures.pdf")) as pdf
 # Sharpe Ratio
 sharpe_ratio = ((a_return.mean() - rf) / a_return.std()) * np.sqrt(252)
 # Print report
+
 riskfile = open(f_getFilePath(f"reports\\Risk Analysis of {ticker_name}.txt"), "w+")
 print(f"Risk Analysis of {ticker_name}\n", file=riskfile)
 print("Expected Return: ", expected_return * 100, file=riskfile)

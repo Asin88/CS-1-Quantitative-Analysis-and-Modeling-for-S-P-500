@@ -106,9 +106,6 @@ from features.feature_selection import train_x_transformed, train_y
 
 # Build training models
 print("Building training models...")
-modelevalfile = open(f_getFilePath("reports\\model_comparison.txt"), "w")
-print("Model Comparison\n\n", file=modelevalfile)
-print("Model Name\tAccuracy\tROC AUC", file=modelevalfile)
 
 estimator_dict = {
     "Baseline": DummyClassifier(strategy="stratified", random_state=42),

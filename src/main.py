@@ -89,13 +89,11 @@ def main():
 
     # Initialize output file
     # Report title
-    d_report = {\
-            "Title": "Project: CS - 1 : Quantitative Analysis and Modeling for S&P 500",
+    d_report = {"Title": "Project: CS - 1 : Quantitative Analysis and Modeling for S&P 500",
              "Author": "Aakriti Sinha",
-             "Created on": '06-10-2020'
-             "Last run on": datetime.now()
-             }
-    df_report = pd.DataFrame(d_report)
+             "Created on": '06-10-2020',
+             "Last run on": datetime.now()}
+    df_report = pd.DataFrame.from_dict(d_report, orient = 'index')
     with pd.ExcelWriter(f_getFilePath("reports\\Output_Report.xlsx"), mode="w+") as writer:
         df_report.to_excel(writer, sheet_name="Title Page")
 
@@ -143,9 +141,6 @@ def main():
 if __name__ == "__main__":
 
     print("Main function")
-    # Output file
-    outfile = open(f_getFilePath("reports\\outfile.txt"), "w+")
     # Call main function
     main()
-    # Close output file
-    outfile.close()
+    

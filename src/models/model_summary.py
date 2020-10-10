@@ -73,6 +73,7 @@ def f_modelSummary(final_model_name, final_model):
         feature_importances = sorted(feature_importances, key=lambda x: x[1], reverse=True)
         # Print out the feature and importances
         [print("Variable: {:20} Importance: {}".format(*pair), file=sumfile) for pair in feature_importances]
+        feature_importances = pd.DataFrame(feature_importances, columns = ['Variables','Importance'])
     else:
         print("\n")
 

@@ -50,10 +50,10 @@ test_x_transformed = minmax.transform(test_x)
 
 # Predict
 test_pred = final_model.predict_proba(test_x_transformed)  # Predicted probabilities of y
-train_pred = pd.DataFrame(train_pred)
-train_pred = train_pred.mask(train_pred <= 0.40, 0)
-train_pred = train_pred.mask((train_pred > 0.40) & (train_pred <= 0.60), 1)
-train_pred = train_pred.mask(train_pred > 0.60, 2)
+test_pred = pd.DataFrame(test_pred)
+test_pred = test_pred.mask(test_pred <= 0.40, 0)
+test_pred = test_pred.mask((test_pred > 0.40) & (test_pred <= 0.60), 1)
+test_pred = test_pred.mask(test_pred > 0.60, 2)
 
 # Model Summary and Merics
 import models.model_summary

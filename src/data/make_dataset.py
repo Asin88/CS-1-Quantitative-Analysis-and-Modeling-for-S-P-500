@@ -13,6 +13,40 @@ Script to load data and make dataset
 import pandas as pd
 import os
 
+# Function to separate date entities
+def f_dataFeatures(df_cs1_new):
+    """
+    This function creates new date features as dummy variables.
+    
+    Arguments:
+        df_cs1_new: dataframe
+        
+    Returns:
+        modified dataframe with dummy date features
+    """
+    # year = lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).year
+    df_cs1_new["year"] = df_cs1_new["date"].dt.year  # map(lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).year)
+    df_cs1_new["month"] = df_cs1_new[
+        "date"
+    ].dt.month  # map(lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).month)
+    df_cs1_new["week"] = (
+        df_cs1_new["date"].dt.isocalendar().week
+    )  # map(lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).strftime('%V'))
+    df_cs1_new["dayOfWeek"] = df_cs1_new[
+        "date"
+    ].dt.dayofweek  # map(lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).weekday())
+    
+    # Identifier for whether a day is a Monday/Friday or Tuesday/Wednesday/Thursday
+    s_mon_fri = pd.Series([0] * df_cs1_new.shape[0])
+    for i in range(0, len(df_cs1_new)):
+        if df_cs1_new["dayOfWeek"][i] == 0 or df_cs1_new["dayOfWeek"][i] == 4:
+            s_mon_fri.iat[i] = 1
+        else:
+            s_mon_fri.iat[i] = 0
+    df_cs1_new["mon_fri"] = s_mon_fri
+    
+    return df_cs1_new
+
 script_path = os.path.abspath(__file__)  # i.e. /path/to/dir/foobar.py
 script_dir1 = os.path.split(script_path)[0]  # i.e. /path/to/dir/
 script_dir2 = os.path.split(script_dir1)[0]  # i.e. /path/to/dir/
@@ -43,24 +77,6 @@ volatile nature of stock market data.
 df_cs1_new.dropna(inplace=True)
 df_cs1_new = df_cs1_new.reset_index()
 
-# Separate date entities
-# year = lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).year
-df_cs1_new["year"] = df_cs1_new["date"].dt.year  # map(lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).year)
-df_cs1_new["month"] = df_cs1_new[
-    "date"
-].dt.month  # map(lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).month)
-df_cs1_new["week"] = (
-    df_cs1_new["date"].dt.isocalendar().week
-)  # map(lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).strftime('%V'))
-df_cs1_new["dayOfWeek"] = df_cs1_new[
-    "date"
-].dt.dayofweek  # map(lambda x: datetime.strptime(str(x), "%Y-%m-%d %H:%M:%S" ).weekday())
+#Separate date entities
+df_cs1_new = f_dataFeatures(df_cs1_new)
 
-# Identifier for whether a day is a Monday/Friday or Tuesday/Wednesday/Thursday
-s_mon_fri = pd.Series([0] * df_cs1_new.shape[0])
-for i in range(0, len(df_cs1_new)):
-    if df_cs1_new["dayOfWeek"][i] == 0 or df_cs1_new["dayOfWeek"][i] == 4:
-        s_mon_fri.iat[i] = 1
-    else:
-        s_mon_fri.iat[i] = 0
-df_cs1_new["mon_fri"] = s_mon_fri
