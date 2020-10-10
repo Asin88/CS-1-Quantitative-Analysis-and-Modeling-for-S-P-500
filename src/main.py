@@ -7,6 +7,8 @@ Created on Tue Oct  6 02:19:26 2020
 CS - 1 : Quantitative Analysis and Modeling for S&P 500
 Main Program
 
+Github Repository: https://github.com/Asin88/CS-1-Quantitative-Analysis-and-Modeling-for-S-P-500
+
 Objective 1: establish a weekly volatility index which ranks stocks on the
 basis of intraday price movements.
 
