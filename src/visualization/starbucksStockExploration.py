@@ -26,7 +26,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from pandas.plotting import lag_plot
 import seaborn as sns
 
-#Set plot style
+# Set plot style
 sns.set_style("whitegrid")
 plt.style.use("fivethirtyeight")
 
@@ -93,9 +93,10 @@ def plotHistograms(df, title, fig_name):
     plt.show()
     plt.close()
 
-#Function to explore one stock
+
+# Function to explore one stock
 def f_exploreStock(df_cs1_new, ticker_name):
-    
+
     """
     This function explores the market performance of a given stock.
     Objective 1 - Output b) Key Statistical Tendencies of given stock:
@@ -110,16 +111,15 @@ def f_exploreStock(df_cs1_new, ticker_name):
         Sharpe Ratio (or Risk-Adjusted Return Ratio)
         Sortino Ratio (or Downside Risk Adjusted Return Ratio)
     """
-    
-    print(f'Deep diving into performance of {ticker_name}...') #print status
-    
-    
+
+    print(f"Deep diving into performance of {ticker_name}...")  # print status
+
     df_tickername = df_cs1_new[df_cs1_new["Name"] == ticker_name]
     df_tickername = df_tickername.set_index("date")
-    
+
     # Create PDF file for figures
     with PdfPages(f_getFilePath("reports\\figures\\Starbuck_Stock_Trend_Figures.pdf")) as pdf:
-    
+
         # Daily closing price
         plotFigures(
             df_tickername[["close"]],
@@ -128,7 +128,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Closing Price",
             f"{ticker_name}_Daily_Closing_Price",
         )
-    
+
         # Daily volume
         plotFigures(
             df_tickername[["volume"]],
@@ -137,7 +137,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Volume",
             f"{ticker_name}_Daily_Volume",
         )
-    
+
         # Histograms
         titles = [
             f"{ticker_name} Opening Prices",
@@ -152,7 +152,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
             if column in ["open", "high", "low", "close", "volume"]:
                 plotHistograms(df_tickername[column], f"{titles[i]}", f"{ticker_name}_{fig_names[i]}_Histogram")
                 i = i + 1
-    
+
         # Daily Returns
         df_tickername["Daily_Return"] = df_tickername["close"].pct_change()
         plotFigures(
@@ -162,7 +162,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Daily Return",
             f"{ticker_name}_Daily_Return",
         )
-    
+
         # Daily Returns - Histogram + KDE Plot
         sns.distplot(df_tickername["Daily_Return"].dropna(), bins=100, color="purple")
         plt.ylabel("Daily Return")
@@ -171,7 +171,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
         pdf.savefig()
         plt.show()
         plt.close()
-    
+
         # Cumulative Return
         df_cr = df_tickername["Price_Returns"].cumsum()
         plotFigures(
@@ -181,14 +181,14 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Cumulative Return",
             f"{ticker_name}_Cumulative_Return",
         )
-    
+
         # Moving Average for 10, 20, 50 days
         ma_day = [10, 20, 50]
-    
+
         for ma in ma_day:
             column_name = f"MA for {ma} days"
             df_tickername[column_name] = df_tickername["close"].rolling(ma).mean()
-    
+
         plotFigures(
             df_tickername[["close", "MA for 10 days", "MA for 20 days", "MA for 50 days"]],
             f"{ticker_name} Moving Average",
@@ -196,7 +196,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Closing Price",
             f"{ticker_name}_Moving_Average",
         )
-    
+
         # Auto-Correlation
         plt.figure(figsize=(10, 10))
         lag_plot(df_tickername["open"], lag=5)
@@ -205,7 +205,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
         pdf.savefig()
         plt.show()
         plt.close()
-    
+
         # Volatility
         plotFigures(
             df_tickername["Volatility"],
@@ -214,12 +214,12 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Historical Volatility",
             f"{ticker_name}_Volatility",
         )
-    
+
         # Risk Analysis
         expected_return = df_tickername["Daily_Return"].mean()
-        total_return = (df_tickername["Daily_Return"].iloc[-1] - df_tickername["Daily_Return"].iloc[1]) / df_tickername[
-            "Daily_Return"
-        ].iloc[1]
+        total_return = (
+            df_tickername["Daily_Return"].iloc[-1] - df_tickername["Daily_Return"].iloc[1]
+        ) / df_tickername["Daily_Return"].iloc[1]
         # annualized_return = (logsumexp((total_return + 1)**(1/6)))-1 #Using special scipy function because exponentail of very large negative number is rounded to zero.
         rf = 0.01  # risk-free return rate (assumed value)
         total_risk = df_tickername["Daily_Return"].std()
@@ -244,11 +244,11 @@ def f_exploreStock(df_cs1_new, ticker_name):
         pdf.savefig()
         plt.show()
         plt.close()
-    
+
     # Sharpe Ratio
     sharpe_ratio = ((a_return.mean() - rf) / a_return.std()) * np.sqrt(252)
     # Print report
-    
+
     riskfile = open(f_getFilePath(f"reports\\Risk Analysis of {ticker_name}.txt"), "w+")
     print(f"Risk Analysis of {ticker_name}\n", file=riskfile)
     print("Expected Return: ", expected_return * 100, file=riskfile)
@@ -265,7 +265,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
         print("Stock performance is fair. Moderate volatility is estimated.", file=riskfile)
     else:
         print("Stock performance is poor. High volatility is estimated.", file=riskfile)
-    
+
     # Sortino Ratio
     # Create a downside return column with the negative returns only
     target = 0
@@ -274,7 +274,7 @@ def f_exploreStock(df_cs1_new, ticker_name):
     down_risk = downside_returns.std()
     # Calculate the sortino ratio
     sortino_ratio = ((a_return.mean() - rf) / down_risk) * np.sqrt(252)
-    
+
     # Print report
     print("\nDownside risk: ", down_risk * 100, file=riskfile)
     print("Sortino ratio: ", sortino_ratio, file=riskfile)
@@ -288,12 +288,13 @@ def f_exploreStock(df_cs1_new, ticker_name):
         print("Stock performance is fair. Moderate downside risk is estimated.", file=riskfile)
     else:
         print("Stock performance is poor. High downside risk is estimated.", file=riskfile)
-    
+
     riskfile.close()
+
 
 """
 Run the script
-"""      
+"""
 if __name__ == "__main__":
 
-    print('Stock Analysis...') #print status
+    print("Stock Analysis...")  # print status

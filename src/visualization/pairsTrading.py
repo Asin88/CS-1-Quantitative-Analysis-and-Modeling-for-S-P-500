@@ -22,7 +22,8 @@ Import modules
 import pandas as pd
 import numpy as np
 import os
-#Import functions from scripts
+
+# Import functions from scripts
 from report.write_report import f_addWorksheet
 
 
@@ -47,10 +48,11 @@ def f_getFilePath(rel_path):
     abs_file_path = os.path.join(cwd_dir, rel_path)
     return abs_file_path
 
+
 def f_pairsTrading(df_cs1_new):
     """
     This function the 5 strongest pairs for every year in the dataset.
-    
+
     Arguments:
         df_cs1_new: dataset
     Returns:
@@ -58,10 +60,10 @@ def f_pairsTrading(df_cs1_new):
     File:
         worksheet with output dataframe added to /report/Output_Report.xlsx
     """
-    
-    print('Finding strongest pairs of each year...') #print status
+
+    print("Finding strongest pairs of each year...")  # print status
     output_2 = pd.DataFrame()
-    
+
     # Get Closing value for each Stock for each year
     for year in df_cs1_new["year"].unique():
         # Select year
@@ -77,7 +79,7 @@ def f_pairsTrading(df_cs1_new):
         stock_closing.columns = stock_closing.iloc[0]
         stock_closing = stock_closing[1:]
         stock_closing = stock_closing.astype(float)
-    
+
         # Build correlation matrix for each year
         corr = stock_closing.corr()
         # Select only upper triangle of matrix
@@ -94,12 +96,12 @@ def f_pairsTrading(df_cs1_new):
         # Append to output dataframe
         output_2 = output_2.append(corr[0:5])
 
-
     # Print report
     f_addWorksheet(output_2, "Pairs_Trading_Strongest_Pairs")
-    
-    #Return output dataframe
+
+    # Return output dataframe
     return output_2
-       
+
+
 if __name__ == "__main__":
-    print("Pairs Trading...") #print status
+    print("Pairs Trading...")  # print status
