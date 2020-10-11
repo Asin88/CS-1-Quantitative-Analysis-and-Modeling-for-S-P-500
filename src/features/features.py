@@ -5,29 +5,28 @@ Created on Thu Oct  8 04:26:43 2020
 @author: AAKRITI
 
 CS - 1 : Quantitative Analysis and Modeling for S&P 500
+"""
+"""
+This script builds the target and feature matrix for binary classification.
 
 Objective 3: Binary Classification - Given a stock and it’s data, you have to
 predict whether it will close lower than it opened (red) or higher than it
 opened (green).
-
-This script builds the target and feature matrix for binary classification. 
+ 
 """
 
-# Import modules
+"""
+Import modules
+"""
 import os
 import numpy as np
 import pandas as pd
-import datetime
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import RepeatedKFold
-from sklearn.feature_selection import RFE
-from sklearn.tree import DecisionTreeRegressor
-from sklearn.pipeline import Pipeline
+#Import functions from scripts
+from report.write_report import addWorksheet
 
-# import graphlab as gl
-# import talib as ta
-
-# Define functions
+"""
+Define functions
+"""
 # Function to get file path
 def f_getFilePath(rel_path):
     """
@@ -57,9 +56,6 @@ Objective 3: Binary Classification
     MA for 10, 20, 50 days, std dev for 7 days, today's close compared with 1 
     or 2 previous days'
 """
-
-# Import dataset from script
-from visualization.calcVolatility import df_cs1_new
 
 # Function to build features
 def f_buildFeatures(df_ticker_pred):
@@ -100,35 +96,68 @@ def f_buildFeatures(df_ticker_pred):
     df_ticker_pred = df_ticker_pred.fillna(0)
     # Integer encoding for ticker name
     df_ticker_pred["Name"] = df_ticker_pred["Name"].astype("category")
-    df_ticker_pred["Name_code"] = df_ticker_pred["Name"].cat.codes
+    df_ticker_pred["Name_code"] = df_ticker_pred["Name"].cat.
+    
+    #Return features dataframe
+    return df_ticker_pred
     
     # Features dataframe
     if "index" in df_ticker_pred.columns:
         df_ticker_pred = df_ticker_pred.drop("index", axis=1)
     features = df_ticker_pred.drop(["date","Name"], axis=1)
-    with pd.ExcelWriter(f_getFilePath("reports\\Output_Report.xlsx"), engine="openpyxl", mode="a") as writer:
-        features.tail(30).to_excel(writer, sheet_name="Features Snapshot")
-    return features
-        
-# select any stock from training dataset
-name_pred = "ABT"
-
-# Make dataframe
-df_ticker_all = df_cs1_new[df_cs1_new["Name"] == name_pred]
-#using data till only 80% of days for training
-days_ratio = 0.80
-df_ticker_pred = df_ticker_all.iloc[:int((len(df_ticker_all)*days_ratio)),:]
-
-# Build target variable
-target = df_ticker_pred["close"] - df_ticker_pred["open"]
-target = target.mask(target > 0, 2)
-target = target.mask(target == 0, 1)
-target = target.mask(target < 0, 0)
-target = target.astype("category")
-with pd.ExcelWriter(f_getFilePath("reports\\Output_Report.xlsx"), engine="openpyxl", mode="a") as writer:
-    target.tail(30).to_excel(writer, sheet_name="Target Snapshot")
     
-#Build features
-features = f_buildFeatures(df_ticker_pred)
+    #Return features dataframe
+    return features
 
-
+def f_targetFeatures(df_cs1_new, pairs, name_pred):
+    """
+    This function builds the target and feature matrices based on a selection of stocks strongly correlated with a given stock.
+    
+    Arguments:
+        df_cs1_new: dataframe with input data
+        pairs: dataframe wih 5 strongest pairs of each year in the dataset
+    
+    Returns:
+        Target dataframe
+        Features dataframe
+    Files:
+        worksheet with snapshot of target variable 
+        worksheet with description of target variable
+        worksheet with snapshot of feature matrix
+        worksheet with description of feature matrix
+    """
+    
+    print('Building target and features...')     #print status
+    
+    #Select strong pairs of stocks containing given stock
+    df_pairs = pairs[pairs['Pair1'] == name_pred]
+    #Get stocks correlated strongly with given stocks
+    df_corr_stocks = pd.DataFrame(df_pairs['Pair2'].unique())
+    
+    df_target = pd.DataFrame()
+    df_features = pd.DataFrame()
+    
+    for corr_stock in df_corr_stocks:
+        
+        # Make dataframe
+        df_ticker_all = df_cs1_new[df_cs1_new["Name"] == corr_stock]
+        #using data till only 80% of days for training
+        days_ratio = 0.80
+        df_ticker_pred = df_ticker_all.iloc[:int((len(df_ticker_all)*days_ratio)),:]
+        
+        # Build target variable
+        df_target = df_target.append(df_ticker_pred["close"] - df_ticker_pred["open"])
+                    
+        #Build features
+        df_features = df_features.append(f_buildFeatures(df_ticker_pred))
+        
+    df_target = df_target.mask(target > 0, 2)
+    df_target = df_target.mask(target == 0, 1)
+    df_target = df_target.mask(target < 0, 0)
+    df_target = df_target.astype("category")
+    
+    #Return target and features dataframes
+    return df_target, df_features
+    
+if __name__ == "__main__":
+    print("Building features...") #print status
