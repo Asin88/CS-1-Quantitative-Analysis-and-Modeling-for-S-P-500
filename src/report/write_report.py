@@ -38,27 +38,29 @@ def f_getFilePath(rel_path):
     abs_file_path = os.path.join(cwd_dir, rel_path)
     return abs_file_path
 
-#Function to add worksheet to output report
+
+# Function to add worksheet to output report
 def f_addWorksheet(df, sheet_name):
     """
     This function adds a worksheet with data from given dataframe to /reports/Output_Report.xlsx.
-    
+
     Arguments:
         df: dataframe contaiing reporting data
         sheet_name: name of new worksheet to be added
-    
+
     Returns:
         None
-    
+
     Files:
         /reports/Output_Reports.xlsx
     """
     with pd.ExcelWriter(f_getFilePath("reports\\Output_Report.xlsx"), engine="openpyxl", mode="a") as writer:
         df.to_excel(writer, sheet_name=sheet_name)
 
+
 """
 Run the script
-"""      
+"""
 if __name__ == "__main__":
 
-    print('Writing Report...') #print status
+    print("Writing Report...")  # print status

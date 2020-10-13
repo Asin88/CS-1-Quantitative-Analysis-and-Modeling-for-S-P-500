@@ -18,13 +18,14 @@ Import modules
 import pandas as pd
 import numpy as np
 import os
+
 # Import functions from scripts
 from report.write_report import f_addWorksheet
 
 # Define functions
 # Function to get file path
 def f_getFilePath(rel_path):
-   
+
     """
     This function gives the absolute file path from a given relative path
 
