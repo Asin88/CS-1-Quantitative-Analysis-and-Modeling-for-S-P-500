@@ -4,13 +4,16 @@ Created on Fri Oct  9 17:01:03 2020
 
 @author: AAKRITI
 CS - 1 : Quantitative Analysis and Modeling for S&P 500
-
+"""
+"""
 This script creates the summary of the trained model and calculates performance metrics.
 
 Objective 3: Binary Classifier
 """
 
-# Import modules
+"""
+Import modules
+"""
 import os
 import pandas as pd
 import numpy as np
@@ -19,8 +22,12 @@ import matplotlib.pyplot as plt
 from itertools import cycle
 from sklearn import metrics
 
+# Import functions from scripts
+from report.write_report import f_addWorksheet
 
-# Define functions
+"""
+Define functions
+"""
 # Function to get file path
 def f_getFilePath(rel_path):
     """
@@ -41,26 +48,38 @@ def f_getFilePath(rel_path):
 
 
 # Function to print summary of final model
-def f_modelSummary(final_model_name, final_model):
+def f_modelSummary(final_model_name, final_model, train_x_transformed):
     """
-    This functions prints the summary of the trained model.
+    This functions writes the summary of the trained model.
 
     Arguments:
     final_model_name: trained model name
     final_model: trained model
 
-    Returns: None
+    Returns:
+        None
+
+    Files:
+        worksheet with parameters of final model
+        worksheet with output of final model
     """
-    print("Final Model: ", final_model_name, "\n\n", file=sumfile)
-    print(final_model.get_params(), file=sumfile)
+    # Write final model parameters
+    final_model_params = pd.DataFrame(final_model.get_params())
+    f_addWorksheet(final_model_params, "Final_Model_Params")
+
+    # Write final model output
     model1 = final_model.named_steps[final_model_name]
+
+    # Do nothing for baseline model
     if final_model_name == "Baseline":
         print("\n")
 
+    # Print intercept and coefficients of logistic regression
     elif final_model_name == "Logistic":
-        print("\nIntercept:\n", model1.coef_)
-        print("\nCoefficients:\n", model1.intercept_)
+        coefficients = model1.coef_
+        intercept = model1.intercept_
 
+    # Print variable importances of decision trees
     elif final_model_name == "CART" or final_model_name == "RFC" or final_model_name == "GBC":
         # Get numerical feature importances
         importances = list(model1.feature_importances_)
@@ -72,8 +91,12 @@ def f_modelSummary(final_model_name, final_model):
         # Sort the feature importances by most important first
         feature_importances = sorted(feature_importances, key=lambda x: x[1], reverse=True)
         # Print out the feature and importances
-        [print("Variable: {:20} Importance: {}".format(*pair), file=sumfile) for pair in feature_importances]
-        feature_importances = pd.DataFrame(feature_importances, columns = ['Variables','Importance'])
+        #        [print("Variable: {:20} Importance: {}".format(*pair), file=sumfile) for pair in feature_importances]
+        feature_importances = pd.DataFrame(feature_importances, columns=["Variables", "Importance"])
+        f_addWorksheet(feature_importances, "Feature_Importances")
+        # Return feature importances
+        return feature_importances
+
     else:
         print("\n")
 
@@ -81,28 +104,32 @@ def f_modelSummary(final_model_name, final_model):
 # Function to generate classification report
 def f_classificationReport(train_y, train_pred):
     """
-    This funtion gives the classification performace metrics: confusion matrix, precicion, recall, accuracy and f-score.
+    This funtion gives the classification performance metrics: confusion matrix, precicion, recall, accuracy and f-score.
 
     Arguments:
         train_y: observed y
         train_pred: predicted y
 
-    Returns: None
+    Returns:
+        None
+
+    Files:
+        worksheet with confusion matrix
+        worksheet with classification report
     """
 
     # Confusion Matrices
     confusionmatrix = metrics.multilabel_confusion_matrix(train_y, train_pred)
+    f_addWorksheet(confusionmatrix, "Confusion_Matrix")
 
     # Find precision, recall, f score, support and accuracy
     class_report = metrics.classification_report(train_y, train_pred)
     accuracy = metrics.accuracy_score(train_y, train_pred)
 
     # Print to summary file
-    print("Saving detailed classification report in summary file")
-    print("\n\nClassification Report", file=sumfile)
-    print("\nConfusion Matrices: \n", confusionmatrix, file=sumfile)
-    print(class_report, file=sumfile)
-    print("Accuracy: ", accuracy, file=sumfile)
+    print("Saving detailed classification report in output file")
+    f_addWorksheet(class_report, "Classification_Report")
+    print("Accuracy: ", accuracy)
 
 
 # Funtion to plot ROC
@@ -124,7 +151,7 @@ def f_rocAUC(train_y, train_pred):
     a = m2.index[m2]
     # Find AUC of ROC
     rocAUC = metrics.roc_auc_score(train_y, train_pred, labels=a, multi_class="ovr")
-    print("\nROC AUC: ", rocAUC, file=sumfile)
+    print("\nROC AUC: ", rocAUC)
 
     # Plot ROC curves for the multilabel problem
 
@@ -186,21 +213,36 @@ def f_rocAUC(train_y, train_pred):
     plt.show()
 
 
-from models.train_model import final_model_name, final_model, train_x_transformed, train_y, train_pred
+# Function to write summary and metrics of final model
+def f_summaryMetrics(final_model_name, final_model, df_x_transformed, df_y, df_pred):
+    """
+    This function writes the summary and calculates performance metrics of final model.
 
-sumfile = open(f_getFilePath("reports\\final_model_summary.txt"), "w+")
-print("Writing model summary...")
-f_modelSummary(final_model_name, final_model)
-# Metrics
-print("Calculating metrics...")
-# if final_model_name == 'Logistic':
-# Binarize labels
-lb = preprocessing.LabelBinarizer()
-train_y = lb.fit_transform(train_y)
-train_y = pd.DataFrame(train_y, columns=["Low", "No_Confidence", "High"])
-train_pred = pd.DataFrame(train_pred.astype(int))
+    Arguments:
+        final_model_name: Name of final model
+        final_model: Parameters of final model
+        df_x_transformed: transformed features
+        df_y: target
+        df_pred: predicted values
+    Returns:
+        None
+    File:
+        worksheet with Model summary
+    """
+    print("Writing model summary...")
+    feature_importances = f_modelSummary(final_model_name, final_model, df_x_transformed)
 
-f_classificationReport(train_y, train_pred)
+    # Metrics
+    print("Calculating metrics...")
+    lb = preprocessing.LabelBinarizer()
+    df_y = lb.fit_transform(df_y)
+    df_y = pd.DataFrame(df_y, columns=["Low", "No_Confidence", "High"])
+    df_pred = pd.DataFrame(df_pred.astype(int))
 
-f_rocAUC(train_y, train_pred)
-sumfile.close()
+    f_classificationReport(df_y, df_pred)
+
+    f_rocAUC(df_y, df_pred)
+
+
+if __name__ == "__main__":
+    print("Summary and metrics...")

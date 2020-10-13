@@ -36,24 +36,33 @@ def f_getFilePath(rel_path):
     return abs_file_path
 
 
-from features.feature_selection import test_x, test_y, minmax
-from models.train_model import final_model
+# Funcion to test final model
+def f_testModel(test_x, test_y, final_model, feature_pipe):
 
-"""
-The features in test dataset are first scaled with MinMax to bring in the range of 0 to 1. 
-Then dimensionality is reduced using Factor Analysis.
+    """
+    The features in test dataset are first scaled with MinMax to bring in the range of 0 to 1.
+    Then dimensionality is reduced using Factor Analysis.
 
-***NOTE: Due to bug issues with dimension reduction techniques (PCA and Factor Analysis), this step has not been performed for the time being.***
-"""
-# Transform test_x with MinMax scaling and Factor Analysis
-test_x_transformed = minmax.transform(test_x)
+    ***NOTE: Due to bug issues with dimension reduction techniques (PCA and Factor Analysis), this step has not been performed for the time being.***
+    """
+    # Transform test_x with MinMax scaling and Factor Analysis
+    # Apply scaler transform
+    minmax = feature_pipe.named_steps["minmax"]
+    #    train_x_scaled = pd.DataFrame(minmax.transform(test_x))
+    test_x_transformed = pd.DataFrame(minmax.transform(test_x))
 
-# Predict
-test_pred = final_model.predict_proba(test_x_transformed)  # Predicted probabilities of y
-test_pred = pd.DataFrame(test_pred)
-test_pred = test_pred.mask(test_pred <= 0.40, 0)
-test_pred = test_pred.mask((test_pred > 0.40) & (test_pred <= 0.60), 1)
-test_pred = test_pred.mask(test_pred > 0.60, 2)
+    # Predict
+    test_pred = final_model.predict_proba(test_x_transformed)  # Predicted probabilities of y
+    test_pred = pd.DataFrame(test_pred)
 
-# Model Summary and Merics
-import models.model_summary
+    # Convert probabilities to classes
+    test_pred = test_pred.mask(test_pred <= 0.40, 0)
+    test_pred = test_pred.mask((test_pred > 0.40) & (test_pred <= 0.60), 1)
+    test_pred = test_pred.mask(test_pred > 0.60, 2)
+
+    # Return predicted values
+    return test_pred
+
+
+if __name__ == "__main__":
+    print("Testing model...")  # print status

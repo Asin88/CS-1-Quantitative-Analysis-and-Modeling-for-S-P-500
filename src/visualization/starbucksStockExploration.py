@@ -65,11 +65,12 @@ def plotFigures(df, title, xlabel, ylabel, fig_name):
 
     Returns: None
     """
+    fig = plt.figure()
     df.plot()
     plt.title(f"{title}")
     plt.xlabel(f"{xlabel}")
     plt.ylabel(f"{ylabel}")
-    #    plt.savefig(f_getFilePath(f'reports\\figures\\{fig_name}.png'))
+    return fig
     pdf.savefig()
     plt.show()
     plt.close()
@@ -86,16 +87,18 @@ def plotHistograms(df, title, fig_name):
 
     Returns: None
     """
+    fig = plt.figure()
     df.plot.hist(figsize=(12, 12))
     plt.title(f"{title}")
-    #    plt.savefig(f_getFilePath(f'reports\\figures\\{fig_name}.png'))
-    pdf.savefig()
-    plt.show()
-    plt.close()
+    fig = plt.figure()
 
 
-# Function to explore one stock
-def f_exploreStock(df_cs1_new, ticker_name):
+"""
+Run the script
+"""
+if __name__ == "__main__":
+
+    print("Stock Analysis...")  # print status
 
     """
     This function explores the market performance of a given stock.
@@ -128,6 +131,9 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Closing Price",
             f"{ticker_name}_Daily_Closing_Price",
         )
+        pdf.savefig(fig)
+        plt.show()
+        plt.close()
 
         # Daily volume
         plotFigures(
@@ -137,6 +143,9 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Volume",
             f"{ticker_name}_Daily_Volume",
         )
+        pdf.savefig(fig)
+        plt.show()
+        plt.close()
 
         # Histograms
         titles = [
@@ -151,24 +160,30 @@ def f_exploreStock(df_cs1_new, ticker_name):
         for column in df_tickername.columns:
             if column in ["open", "high", "low", "close", "volume"]:
                 plotHistograms(df_tickername[column], f"{titles[i]}", f"{ticker_name}_{fig_names[i]}_Histogram")
+                pdf.savefig(fig)
+                plt.show()
+                plt.close()
                 i = i + 1
 
         # Daily Returns
         df_tickername["Daily_Return"] = df_tickername["close"].pct_change()
-        plotFigures(
+        fig = plotFigures(
             df_tickername["Daily_Return"],
             f"{ticker_name} Daily Return",
             "Time (in days)",
             "Daily Return",
             f"{ticker_name}_Daily_Return",
         )
+        pdf.savefig(fig)
+        plt.show()
+        plt.close()
 
         # Daily Returns - Histogram + KDE Plot
+        fig = plt.figure()
         sns.distplot(df_tickername["Daily_Return"].dropna(), bins=100, color="purple")
         plt.ylabel("Daily Return")
         plt.title(f"{ticker_name} Daily Return Histogram")
-        #    plt.savefig(f_getFilePath(f'reports\\figures\\{ticker_name}_Daily_Return_HistKDE.png'))
-        pdf.savefig()
+        pdf.savefig(fig)
         plt.show()
         plt.close()
 
@@ -181,6 +196,9 @@ def f_exploreStock(df_cs1_new, ticker_name):
             "Cumulative Return",
             f"{ticker_name}_Cumulative_Return",
         )
+        pdf.savefig(fig)
+        plt.show()
+        plt.close()
 
         # Moving Average for 10, 20, 50 days
         ma_day = [10, 20, 50]
@@ -189,13 +207,16 @@ def f_exploreStock(df_cs1_new, ticker_name):
             column_name = f"MA for {ma} days"
             df_tickername[column_name] = df_tickername["close"].rolling(ma).mean()
 
-        plotFigures(
+        fig = plotFigures(
             df_tickername[["close", "MA for 10 days", "MA for 20 days", "MA for 50 days"]],
             f"{ticker_name} Moving Average",
             "Time (in days)",
             "Closing Price",
             f"{ticker_name}_Moving_Average",
         )
+        pdf.savefig(fig)
+        plt.show()
+        plt.close()
 
         # Auto-Correlation
         plt.figure(figsize=(10, 10))
@@ -207,13 +228,16 @@ def f_exploreStock(df_cs1_new, ticker_name):
         plt.close()
 
         # Volatility
-        plotFigures(
+        fig = plotFigures(
             df_tickername["Volatility"],
             f"{ticker_name} Volatility",
             "Time (in days)",
             "Historical Volatility",
             f"{ticker_name}_Volatility",
         )
+        pdf.savefig(fig)
+        plt.show()
+        plt.close()
 
         # Risk Analysis
         expected_return = df_tickername["Daily_Return"].mean()
@@ -228,6 +252,9 @@ def f_exploreStock(df_cs1_new, ticker_name):
         # Plot returns vs risk
         x = df_tickername["Daily_Return"].mean()
         y = df_tickername["Daily_Return"].std()
+
+        # Plot returns vs risk
+        fig = plt.figure()
         plt.scatter(x, y, s=np.pi * 20)
         plt.xlabel("Expected return")
         plt.ylabel("Risk")
@@ -290,11 +317,3 @@ def f_exploreStock(df_cs1_new, ticker_name):
         print("Stock performance is poor. High downside risk is estimated.", file=riskfile)
 
     riskfile.close()
-
-
-"""
-Run the script
-"""
-if __name__ == "__main__":
-
-    print("Stock Analysis...")  # print status
